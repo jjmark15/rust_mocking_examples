@@ -8,6 +8,8 @@ trait Greeter {
 
 #[cfg(test)]
 mod tests {
+    use spectral::prelude::*;
+
     use super::*;
 
     #[test]
@@ -19,6 +21,6 @@ mod tests {
             .times(1..2)
             .returns(String::from("Hello world"));
 
-        assert_eq!("Hello world", greeter.greet("world"));
+        assert_that(&greeter.greet("world")).is_equal_to("Hello world".to_string());
     }
 }

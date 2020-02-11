@@ -9,6 +9,7 @@ trait MyTrait {
 #[cfg(test)]
 mod tests {
     use mockall::predicate::*;
+    use spectral::prelude::*;
 
     use super::*;
 
@@ -16,6 +17,7 @@ mod tests {
     fn my_test() {
         let mut mock = MockMyTrait::new();
         mock.expect_foo().with(eq(4)).times(1).returning(|x| x + 1);
-        assert_eq!(5, mock.foo(4));
+
+        assert_that(&mock.foo(4)).is_equal_to(5);
     }
 }
