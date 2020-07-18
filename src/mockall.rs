@@ -1,5 +1,6 @@
 #[cfg(test)]
 use std::fmt::Debug;
+use std::str::FromStr;
 
 #[cfg(test)]
 use mockall::{automock, mock, predicate::*};
@@ -9,7 +10,7 @@ trait MyTrait {
     fn foo(&self, x: u32) -> u32;
 }
 
-trait ComplexTrait: Clone + Default + Eq + PartialEq {
+trait ComplexTrait: Clone + Default + Eq + PartialEq + FromStr {
     fn returns_a_number() -> u8;
 }
 
@@ -33,6 +34,11 @@ mock! {
 
     trait Debug {
         fn fmt<'a>(&self, f: &mut std::fmt::Formatter<'a>) -> std::fmt::Result;
+    }
+
+    trait FromStr {
+        type Err=String;
+        fn from_str(s: &str) -> Result<MockComplexTraitImpl, String>;
     }
 }
 
@@ -61,10 +67,17 @@ mod tests {
         // prime static method
         let ctx = MockComplexTraitImpl::returns_a_number_context();
         ctx.expect().return_once(|| 2);
+        // prime associated type trait method
+        let from_str_context = MockComplexTraitImpl::from_str_context();
+        from_str_context
+            .expect()
+            .return_once(|s| Err(format!("could not parse from \"{}\"", s)));
 
         let other_instance = mock.clone();
 
         assert_that(&mock).is_equal_to(other_instance);
         assert_that(&MockComplexTraitImpl::returns_a_number()).is_equal_to(2);
+        assert_that(&MockComplexTraitImpl::from_str("well hello"))
+            .is_equal_to(Err("could not parse from \"well hello\"".to_string()));
     }
 }
