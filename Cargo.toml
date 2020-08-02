@@ -9,6 +9,6 @@ edition = "2018"
 [dependencies]
 
 [dev-dependencies]
-mockall = "0.7"
+mockall = "^0.7.2"
 mockiato = "0.9.5"
 spectral = "0.6.0"
